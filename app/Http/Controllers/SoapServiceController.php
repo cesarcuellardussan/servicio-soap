@@ -121,6 +121,32 @@ class SoapServiceController extends Controller
             'encoded',
             'Metodo para confirmar pago'
         );
+
+        //Estructura CheckBalance
+        $server->wsdl->addComplexType(
+            'Check',
+            'complexType',
+            'struct',
+            'all',
+            '',
+            array(
+                'documento' => array('name' => 'documento', 'type' => 'xsd:string'),
+                'celular'   => array('name' => 'celular', 'type' => 'xsd:string'),
+            )
+        );
+
+        //Registro el metodo CheckBalance
+        $server->register(
+            'CheckBalance',
+            array('request' => 'tns:Check'),
+            $Response,
+            $nameSpace,
+            'urn:server#CheckBalanceServer',
+            'rpc',
+            'encoded',
+            'Metodo para consultar el saldo'
+        );
+
         $rawPostData = file_get_contents("php://input");
         return Response::make($server->service($rawPostData), 200, array('Content-Type' => 'text/xml; charset=ISO-8859-1'));
         // return Response::make($server->service($rawPostData), 200,[]);

@@ -227,3 +227,56 @@ function ConfirmPayment($request){
         ];
     }
 }
+
+//Metodo para consultar el saldo
+function CheckBalance($request){
+    $rules= [
+        'documento' => 'required',
+        'celular'   => 'required',
+    ];
+
+    $validator = Validator::make($request, $rules);
+
+    try{
+        //Errores de validacion
+        if ($validator->fails()){
+            return [
+                'success'       => 'false',
+                'cod_error'     => '400',
+                'message_error' => $validator->errors()->first(),
+            ];
+        }else{
+            //Busco el documento
+            $client = Client::where(['documento' => $request['documento']])->first();
+            if ($client) {
+                //Comparo el numero de celular
+                if ($client->celular == $request['celular']) {
+                    return [
+                        'success'       => 'true',
+                        'cod_error'     => '200',
+                        'message_error' => 'the account balance is: '.$client->saldo.' currency units'
+                    ];
+                }else{
+                    return [
+                        'success'       => 'false',
+                        'cod_error'     => '400',
+                        'message_error' => 'incorrect celular value'
+                    ];
+                }
+            }else{
+                return [
+                    'success'       => 'false',
+                    'cod_error'     => '400',
+                    'message_error' => 'The document number cannot be found in the database'
+                ];
+            }
+        }
+    } catch (\Throwable $th) {
+        //Errores de fallo de servidor
+        return [
+            'success'       => 'false',
+            'cod_error'     => '500',
+            'message_error' => $th->getMessage()
+        ];
+    }
+}
