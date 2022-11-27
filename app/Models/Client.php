@@ -18,7 +18,10 @@ class Client extends Model
         'documento',
         'nombres',
         'email',
-        'celular'
+        'celular',
+        'saldo',
+        'token',
+        'payment'
     ];
 
     /**

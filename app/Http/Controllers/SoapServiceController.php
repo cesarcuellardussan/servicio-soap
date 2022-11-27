@@ -97,6 +97,30 @@ class SoapServiceController extends Controller
             'Metodo para pagar una compra'
         );
 
+        //Estructura ConfirmPayment
+        $server->wsdl->addComplexType(
+            'Confirm',
+            'complexType',
+            'struct',
+            'all',
+            '',
+            array(
+                'id'      => array('name' => 'id', 'type' => 'xsd:integer'),
+                'token'   => array('name' => 'token', 'type' => 'xsd:string'),
+            )
+        );
+
+        //Registro el metodo ConfirmPayment
+        $server->register(
+            'ConfirmPayment',
+            array('request' => 'tns:Confirm'),
+            $Response,
+            $nameSpace,
+            'urn:server#ConfirmPaymentServer',
+            'rpc',
+            'encoded',
+            'Metodo para confirmar pago'
+        );
         $rawPostData = file_get_contents("php://input");
         return Response::make($server->service($rawPostData), 200, array('Content-Type' => 'text/xml; charset=ISO-8859-1'));
         // return Response::make($server->service($rawPostData), 200,[]);
