@@ -19,6 +19,8 @@ class CreateClientsTable extends Migration
             $table->string('nombres');
             $table->string('email');
             $table->string('celular');
+            $table->float('saldo')->default(0);
+            $table->string('token',6)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

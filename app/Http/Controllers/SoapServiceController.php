@@ -21,7 +21,7 @@ class SoapServiceController extends Controller
             'message_error' => 'xsd:string',
         );
 
-        //Validacion Register client
+        //Estructura RegisterClient
         $server->wsdl->addComplexType(
             'Register',
             'complexType',
@@ -34,7 +34,6 @@ class SoapServiceController extends Controller
                     'celular' => array('name' => 'celular', 'type' => 'xsd:string'),
             )
         );
-
         //Registro el metodo RegisterClient
         $server->register(
             'RegisterClient',
@@ -46,7 +45,35 @@ class SoapServiceController extends Controller
             'encoded',
             'Metodo para registrar un cliente'
         );
+
+        //Estructura RechargeWallet
+        $server->wsdl->addComplexType(
+            'Recharge',
+            'complexType',
+            'struct',
+            'all',
+            '',
+            array(
+                'documento' => array('name' => 'documento', 'type' => 'xsd:string'),
+                'celular' => array('name' => 'celular', 'type' => 'xsd:string'),
+                'valor'   => array('name' => 'valor', 'type' => 'xsd:decimal'),
+            )
+        );
+
+        //Registro el metodo RechargeWallet
+        $server->register(
+            'RechargeWallet',
+            array('request' => 'tns:Recharge'),
+            $Response,
+            $nameSpace,
+            'urn:server#RechargeWalletServer',
+            'rpc',
+            'encoded',
+            'Metodo para recargar la billetera'
+        );
+
         $rawPostData = file_get_contents("php://input");
         return Response::make($server->service($rawPostData), 200, array('Content-Type' => 'text/xml; charset=ISO-8859-1'));
+        // return Response::make($server->service($rawPostData), 200,[]);
     }
 }
