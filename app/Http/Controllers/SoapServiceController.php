@@ -72,6 +72,31 @@ class SoapServiceController extends Controller
             'Metodo para recargar la billetera'
         );
 
+        //Estructura PayPurchase
+        $server->wsdl->addComplexType(
+            'Pay',
+            'complexType',
+            'struct',
+            'all',
+            '',
+            array(
+                'documento' => array('name' => 'documento', 'type' => 'xsd:string'),
+                'valor'   => array('name' => 'valor', 'type' => 'xsd:decimal'),
+            )
+        );
+
+        //Registro el metodo PayPurchase
+        $server->register(
+            'PayPurchase',
+            array('request' => 'tns:Pay'),
+            $Response,
+            $nameSpace,
+            'urn:server#PayPurchaseServer',
+            'rpc',
+            'encoded',
+            'Metodo para pagar una compra'
+        );
+
         $rawPostData = file_get_contents("php://input");
         return Response::make($server->service($rawPostData), 200, array('Content-Type' => 'text/xml; charset=ISO-8859-1'));
         // return Response::make($server->service($rawPostData), 200,[]);

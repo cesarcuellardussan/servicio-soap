@@ -100,3 +100,58 @@ function RechargeWallet($request){
         ];
     }
 }
+
+//Metodo para pagar compras
+function PayPurchase($request){
+    $rules= [
+        'documento' => 'required',
+        'valor'     => 'required|numeric|gt:0',
+    ];
+
+    $validator = Validator::make($request, $rules);
+
+    try{
+        //Errores de validacion
+        if ($validator->fails()){
+            return [
+                'success'       => 'false',
+                'cod_error'     => '400',
+                'message_error' => $validator->errors()->first(),
+            ];
+        }else{
+            //Busco el documento
+            $client = Client::where(['documento' => $request['documento']])->first();
+            if ($client) {
+                $saldo  = $client->saldo - $request['valor'];
+                if ($saldo >= 0) {
+                    $token = substr(mb_strtoupper(md5(time())), 0, 6);
+                    Client::where('id',$client->id)->update(['token' => $token]);
+                    return [
+                        'success'       => 'true',
+                        'cod_error'     => '200',
+                        'message_error' => 'A payment confirmation email has been sent to the email : '.$client->email
+                    ];
+                }else{
+                    return [
+                        'success'       => 'false',
+                        'cod_error'     => '400',
+                        'message_error' => 'insufficient balance'
+                    ];
+                }
+            }else{
+                return [
+                    'success'       => 'false',
+                    'cod_error'     => '400',
+                    'message_error' => 'The document number cannot be found in the database'
+                ];
+            }
+        }
+    } catch (\Throwable $th) {
+        //Errores de fallo de servidor
+        return [
+            'success'       => 'false',
+            'cod_error'     => '500',
+            'message_error' => $th->getMessage()
+        ];
+    }
+}
